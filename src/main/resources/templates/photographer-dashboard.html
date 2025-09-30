@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photographer Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+
+<div class="container mx-auto p-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800" th:text="'Welcome, ' + ${photographer.name} + '!'"></h1>
+        <p class="text-gray-600">You can manage everything from here!</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Upcoming Events -->
+        <div class="col-span-1 lg:col-span-2">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Upcoming Events</h2>
+                <div th:if="${#lists.isEmpty(upcomingEvents)}" class="text-gray-500">
+                    No upcoming events.
+                </div>
+                <ul th:unless="${#lists.isEmpty(upcomingEvents)}" class="space-y-4">
+                    <li th:each="event : ${upcomingEvents}" class="p-4 bg-gray-50 rounded-md border border-gray-200">
+                        <p class="font-bold text-lg" th:text="${event.eventName}"></p>
+                        <p class="text-sm text-gray-600">
+                            <span th:text="${#dates.format(event.date, 'dd MMM yyyy')}"></span> at
+                            <span th:text="${event.startTime}"></span>
+                        </p>
+                        <p class="text-sm text-gray-500" th:text="${event.venue}"></p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Recent Reviews -->
+        <div class="col-span-1">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Recent Reviews</h2>
+                <div th:if="${#lists.isEmpty(recentReviews)}" class="text-gray-500">
+                    No recent reviews.
+                </div>
+                <ul th:unless="${#lists.isEmpty(recentReviews)}" class="space-y-4">
+                    <li th:each="review : ${recentReviews}" class="border-b pb-2">
+                        <div class="flex justify-between items-center">
+                            <p class="font-semibold" th:text="${review.clientName}"></p>
+                            <div class="flex items-center">
+                                <span class="text-yellow-500" th:text="${review.rating} + ' ★'"></span>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 italic">" <span th:text="${review.comment}"></span> "</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Album Management -->
+        <div class="col-span-1 md:col-span-2 lg:col-span-3">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Album Management</h2>
+
+                <!-- Create Album Form -->
+                <div class="mb-6 p-4 border rounded-md bg-gray-50">
+                    <h3 class="text-lg font-semibold mb-2">Create New Album</h3>
+                    <form th:action="@{/photographer/album/create}" method="post" th:object="${newAlbum}">
+                        <input type="hidden" name="photographerId" th:value="${photographer.photographerID}" />
+                        <div class="mb-3">
+                            <label for="eventID" class="block text-sm font-medium text-gray-700">Select Event</label>
+                            <select id="eventID" name="eventID" th:field="*{eventID}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <option th:each="event : ${pastEvents}" th:value="${event.eventID}" th:text="${event.eventName}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="albumName" class="block text-sm font-medium text-gray-700">Album Name</label>
+                            <input type="text" id="albumName" name="albumName" th:field="*{albumName}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                            <textarea id="description" name="description" th:field="*{description}" rows="2" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create Album</button>
+                    </form>
+                </div>
+
+                <!-- Existing Albums & Photo Upload -->
+                <div th:if="${not #lists.isEmpty(albums)}">
+                    <h3 class="text-lg font-semibold mb-2">Your Albums</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div th:each="album : ${albums}" class="p-4 border rounded-md">
+                            <p class="font-bold" th:text="${album.albumName}"></p>
+                            <p class="text-sm text-gray-600" th:text="${album.description}"></p>
+
+                            <form th:action="@{/photographer/photo/upload}" method="post" enctype="multipart/form-data" class="mt-4">
+                                <input type="hidden" name="albumId" th:value="${album.albumID}" />
+                                <input type="hidden" name="photographerId" th:value="${photographer.photographerID}" />
+                                <div class="mb-2">
+                                    <label class="block text-sm font-medium text-gray-700">Upload Photos</label>
+                                    <input type="file" name="files" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" multiple required />
+                                </div>
+                                <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded text-sm">Upload</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
