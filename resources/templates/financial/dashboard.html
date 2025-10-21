@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Dashboard - Event Photography</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .dashboard-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .metric-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        .metric-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .metric-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        .revenue-positive { color: #28a745; }
+        .revenue-warning { color: #ffc107; }
+        .revenue-danger { color: #dc3545; }
+        .revenue-info { color: #17a2b8; }
+        .activity-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .activity-item {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        .welcome-header {
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .welcome-header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .welcome-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .quick-actions {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .quick-actions .btn {
+            border-radius: 25px;
+            padding: 0.75rem 2rem;
+            margin: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .quick-actions .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .chart-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-paid { background-color: #d4edda; color: #155724; }
+        .badge-unpaid { background-color: #f8d7da; color: #721c24; }
+        .badge-partial { background-color: #fff3cd; color: #856404; }
+        .badge-approved { background-color: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px);">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="#">
+            <i class="bi bi-camera-fill me-2"></i>Event Photography Finance
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/financial/dashboard}">
+                        <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/financial/invoices}">
+                        <i class="bi bi-file-earmark-text me-1"></i>Invoices
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/financial/expenses}">
+                        <i class="bi bi-receipt me-1"></i>Expenses
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/financial/reports}">
+                        <i class="bi bi-graph-up me-1"></i>Reports
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/auth/logout}">
+                        <i class="bi bi-box-arrow-right me-1"></i>Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <!-- Welcome Header -->
+    <div class="welcome-header">
+        <h1><i class="bi bi-bar-chart-fill me-3"></i>Financial Dashboard</h1>
+        <p>Monitor your event photography business performance at a glance</p>
+    </div>
+
+    <!-- Main Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Key Metrics Row -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="metric-card text-center">
+                    <i class="bi bi-currency-dollar metric-icon revenue-positive"></i>
+                    <div class="metric-value revenue-positive" th:text="'Rs. ' + ${#numbers.formatDecimal(totalRevenue, 1, 'COMMA', 2, 'POINT')}">Rs. 0.00</div>
+                    <div class="metric-label">Total Revenue</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="metric-card text-center">
+                    <i class="bi bi-hourglass-split metric-icon revenue-warning"></i>
+                    <div class="metric-value revenue-warning" th:text="'Rs. ' + ${#numbers.formatDecimal(pendingRevenue, 1, 'COMMA', 2, 'POINT')}">Rs. 0.00</div>
+                    <div class="metric-label">Pending Revenue</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="metric-card text-center">
+                    <i class="bi bi-receipt-cutoff metric-icon revenue-danger"></i>
+                    <div class="metric-value revenue-danger" th:text="'Rs. ' + ${#numbers.formatDecimal(totalExpenseAmount, 1, 'COMMA', 2, 'POINT')}">Rs. 0.00</div>
+                    <div class="metric-label">Total Expenses</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="metric-card text-center">
+                    <i class="bi bi-graph-up metric-icon revenue-info"></i>
+                    <div class="metric-value revenue-info" th:text="'Rs. ' + ${#numbers.formatDecimal(netProfit, 1, 'COMMA', 2, 'POINT')}">Rs. 0.00</div>
+                    <div class="metric-label">Net Profit</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice & Expense Overview -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="metric-card">
+                    <h5 class="mb-3"><i class="bi bi-file-earmark-text me-2"></i>Invoice Overview</h5>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="h3 text-primary" th:text="${totalInvoices}">0</div>
+                            <small class="text-muted">Total Invoices</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="h3 text-warning" th:text="${unpaidInvoices}">0</div>
+                            <small class="text-muted">Unpaid</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="h3 text-danger" th:text="${overdueInvoices}">0</div>
+                            <small class="text-muted">Overdue</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="metric-card">
+                    <h5 class="mb-3"><i class="bi bi-receipt me-2"></i>Expense Overview</h5>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="h3 text-info" th:text="${totalExpenses}">0</div>
+                            <small class="text-muted">Total Expenses</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="h3 text-success" th:text="'Rs. ' + ${#numbers.formatDecimal(totalExpenseAmount, 1, 'COMMA', 2, 'POINT')}">Rs. 0.00</div>
+                            <small class="text-muted">Amount</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="activity-card">
+                    <h5 class="mb-3"><i class="bi bi-clock-history me-2"></i>Recent Invoices</h5>
+                    <div th:if="${#lists.isEmpty(recentInvoices)}" class="text-muted text-center py-3">
+                        No recent invoices found
+                    </div>
+                    <div th:each="invoice : ${recentInvoices}" class="activity-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="fw-semibold" th:text="'Invoice #' + ${invoice.invoiceID}">Invoice #1</div>
+                            <small class="text-muted" th:text="${#temporals.format(invoice.invoiceDate, 'MMM dd, yyyy')}">Date</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-bold" th:text="'Rs. ' + ${#numbers.formatDecimal(invoice.totalAmount, 1, 'COMMA', 2, 'POINT')}">Rs. 0.00</div>
+                            <span class="status-badge"
+                                  th:class="'status-badge ' + (${invoice.status == 'Paid'} ? 'badge-paid' : (${invoice.status == 'Partial'} ? 'badge-partial' : 'badge-unpaid'))"
+                                  th:text="${invoice.status}">Status</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="activity-card">
+                    <h5 class="mb-3"><i class="bi bi-clock-history me-2"></i>Recent Expenses</h5>
+                    <div th:if="${#lists.isEmpty(recentExpenses)}" class="text-muted text-center py-3">
+                        No recent expenses found
+                    </div>
+                    <div th:each="expense : ${recentExpenses}" class="activity-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="fw-semibold" th:text="${expense.expenseType}">Category</div>
+                            <small class="text-muted" th:text="${#temporals.format(expense.expenseDate, 'MMM dd, yyyy')}">Date</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-bold" th:text="'Rs. ' + ${#numbers.formatDecimal(expense.amount, 1, 'COMMA', 2, 'POINT')}">Rs. 0.00</div>
+                            <span class="status-badge badge-approved" th:text="${expense.status}">Status</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h5 class="text-white mb-3">Quick Actions</h5>
+            <a th:href="@{/financial/invoices/create}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Create Invoice
+            </a>
+            <a th:href="@{/financial/expenses/create}" class="btn btn-success">
+                <i class="bi bi-plus-circle me-2"></i>Add Expense
+            </a>
+            <a th:href="@{/financial/reports}" class="btn btn-info">
+                <i class="bi bi-graph-up me-2"></i>Generate Report
+            </a>
+            <a th:href="@{/financial/reports/list}" class="btn btn-secondary">
+                <i class="bi bi-list me-2"></i>View Reports
+            </a>
+            <a th:href="@{/financial/invoices/unpaid}" class="btn btn-warning">
+                <i class="bi bi-exclamation-triangle me-2"></i>View Unpaid
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Add some interactive animations
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate metric cards on load
+        const metricCards = document.querySelectorAll('.metric-card');
+        metricCards.forEach((card, index) => {
+            setTimeout(() => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'all 0.6s ease';
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100);
+            }, index * 100);
+        });
+    });
+</script>
+</body>
+</html>

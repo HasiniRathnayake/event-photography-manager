@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Details - Event Photography</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .dashboard-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .booking-details-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .page-header {
+            color: white;
+            margin-bottom: 2rem;
+        }
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .detail-row {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-pending { background-color: #fff3cd; color: #856404; }
+        .badge-confirmed { background-color: #d1ecf1; color: #0c5460; }
+        .badge-completed { background-color: #d4edda; color: #155724; }
+        .badge-cancelled { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px);">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="#">
+            <i class="bi bi-briefcase me-2"></i>Event Photography Organizer
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/event-organizer/dashboard}">
+                        <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/event-organizer/events}">
+                        <i class="bi bi-calendar-event me-1"></i>Events
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/event-organizer/bookings}">
+                        <i class="bi bi-book me-1"></i>Bookings
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/notifications}">
+                        <i class="bi bi-bell me-1"></i>Notifications
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/auth/logout}">
+                        <i class="bi bi-box-arrow-right me-1"></i>Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1><i class="bi bi-book me-3"></i>Booking Details</h1>
+        <p class="text-white">Detailed information about the booking</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="dashboard-container">
+        <div class="booking-details-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Booking #<span th:text="${booking.bookingID}">1</span></h2>
+                <div>
+                    <span class="status-badge"
+                          th:class="'status-badge ' + (${booking.status == 'Pending'} ? 'badge-pending' : 
+                          (${booking.status == 'Confirmed'} ? 'badge-confirmed' : 
+                          (${booking.status == 'Completed'} ? 'badge-completed' : 'badge-cancelled')))"
+                          th:text="${booking.status}">
+                        Status
+                    </span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">Booking ID:</div>
+                        <div th:text="${booking.bookingID}">1</div>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <div class="detail-label">Event:</div>
+                        <div th:text="${booking.event?.eventName ?: 'N/A'}">Event Name</div>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <div class="detail-label">Photographer:</div>
+                        <div th:text="${booking.photographer?.user?.name ?: 'N/A'}">Photographer Name</div>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <div class="detail-label">Booking Date:</div>
+                        <div th:text="${#temporals.format(booking.bookingDate, 'MMM dd, yyyy HH:mm')}">Booking Date</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">Total Amount:</div>
+                        <div th:text="'Rs. ' + ${#numbers.formatDecimal(booking.totalAmount, 1, 'COMMA', 2, 'POINT')}">Total Amount</div>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <div class="detail-label">Advance Payment:</div>
+                        <div th:text="'Rs. ' + ${#numbers.formatDecimal(booking.advancePayment, 1, 'COMMA', 2, 'POINT')}">Advance Payment</div>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <div class="detail-label">Notes:</div>
+                        <div th:text="${booking.notes ?: 'No notes provided'}">Notes</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                <a th:href="@{/event-organizer/bookings}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Bookings
+                </a>
+                <a th:href="@{'/event-organizer/bookings/' + ${booking.bookingID} + '/edit'}" class="btn btn-primary">
+                    <i class="bi bi-pencil me-2"></i>Edit Booking
+                </a>
+                <a th:href="@{'/event-organizer/bookings/' + ${booking.bookingID} + '/cancel'}" class="btn btn-danger" 
+                   onclick="return confirm('Are you sure you want to cancel this booking?')">
+                    <i class="bi bi-x-circle me-2"></i>Cancel Booking
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

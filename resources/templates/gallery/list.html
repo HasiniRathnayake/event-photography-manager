@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gallery List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <h2>Gallery List</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="gallery : ${galleryList}">
+                <td th:text="${gallery.title}">Title</td>
+                <td th:text="${gallery.status}">Status</td>
+                <td>
+                    <a th:href="@{/galleries/edit/{id}(id=${gallery.galleryID})}" class="btn btn-primary btn-sm">Edit</a>
+                    <form th:action="@{/galleries/delete/{id}(id=${gallery.galleryID})}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <a th:href="@{/galleries/create}" class="btn btn-success">Add Gallery</a>
+</div>
+</body>
+</html>

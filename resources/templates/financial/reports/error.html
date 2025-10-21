@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Error - Financial Management</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    .error-container { text-align: center; }
+    .error-code { font-size: 48px; color: #dc3545; }
+    .error-message { font-size: 18px; margin: 20px 0; }
+    .back-link { display: inline-block; margin-top: 20px;
+      padding: 10px 20px; background-color: #007bff;
+      color: white; text-decoration: none; border-radius: 5px; }
+  </style>
+</head>
+<body>
+<div class="error-container">
+  <div class="error-code">Error</div>
+  <div class="error-message">
+    Something went wrong. This might be due to:
+    <ul style="text-align: left; display: inline-block; margin-top: 10px;">
+      <li>Database connection issues</li>
+      <li>The page you're looking for doesn't exist</li>
+      <li>Server configuration problems</li>
+    </ul>
+  </div>
+  <a href="/financial/dashboard" class="back-link">Go to Dashboard</a>
+</div>
+</body>
+</html>
