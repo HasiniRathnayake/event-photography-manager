@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Expense - Event Photography Finance</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #2c3e50;
+        }
+        .form-header h2 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .form-header p {
+            color: #6c757d;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+        }
+        .btn-secondary {
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+        }
+        .currency-label {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-weight: 600;
+        }
+        .currency-input {
+            padding-left: 2.5rem;
+        }
+        .expense-type-icon {
+            margin-right: 0.5rem;
+        }
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .category-card {
+            text-align: center;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .category-card:hover {
+            border-color: #667eea;
+            background-color: #f8f9ff;
+        }
+        .category-card.active {
+            border-color: #667eea;
+            background-color: #667eea;
+            color: white;
+        }
+        .category-card i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px);">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="#">
+            <i class="bi bi-camera-fill me-2"></i>Event Photography Finance
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/financial/dashboard}">
+                        <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/financial/invoices}">
+                        <i class="bi bi-file-earmark-text me-1"></i>Invoices
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/financial/expenses}">
+                        <i class="bi bi-receipt me-1"></i>Expenses
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/financial/reports}">
+                        <i class="bi bi-graph-up me-1"></i>Reports
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="form-container">
+        <div class="form-header">
+            <h2><i class="bi bi-receipt-cutoff me-3"></i>Record New Expense</h2>
+            <p>Track your photography business expenses for better financial management</p>
+        </div>
+
+        <!-- Error message display -->
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Error:</strong> <span th:text="${error}">Error message</span>
+        </div>
+
+        <form th:action="@{/financial/expenses/create}" th:object="${expense}" method="post">
+            <!-- Expense Type Selection -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold">
+                    <i class="bi bi-tag me-2"></i>Expense Category
+                </label>
+                <select class="form-select" th:field="*{expenseType}" required style="display: none;" id="expenseTypeSelect">
+                    <option value="">Select Expense Type</option>
+                    <option value="Equipment">Equipment</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Meals">Meals</option>
+                    <option value="Accommodation">Accommodation</option>
+                    <option value="Software">Software</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <div class="category-grid">
+                    <div class="category-card" data-value="Equipment">
+                        <i class="bi bi-camera"></i>
+                        <div class="fw-semibold">Equipment</div>
+                    </div>
+                    <div class="category-card" data-value="Travel">
+                        <i class="bi bi-car-front"></i>
+                        <div class="fw-semibold">Travel</div>
+                    </div>
+                    <div class="category-card" data-value="Meals">
+                        <i class="bi bi-cup-straw"></i>
+                        <div class="fw-semibold">Meals</div>
+                    </div>
+                    <div class="category-card" data-value="Accommodation">
+                        <i class="bi bi-house"></i>
+                        <div class="fw-semibold">Accommodation</div>
+                    </div>
+                    <div class="category-card" data-value="Software">
+                        <i class="bi bi-laptop"></i>
+                        <div class="fw-semibold">Software</div>
+                    </div>
+                    <div class="category-card" data-value="Other">
+                        <i class="bi bi-three-dots"></i>
+                        <div class="fw-semibold">Other</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="amount" class="form-label fw-semibold">
+                            <i class="bi bi-currency-rupee me-2"></i>Amount (Rs.)
+                        </label>
+                        <div class="position-relative">
+                            <span class="currency-label">Rs.</span>
+                            <input type="number" step="0.01" min="0.01" class="form-control currency-input" id="amount"
+                                   th:field="*{amount}" placeholder="0.00" required>
+                        </div>
+                        <div class="form-text">Enter the expense amount in Sri Lankan Rupees (must be greater than 0)</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="expenseDate" class="form-label fw-semibold">
+                            <i class="bi bi-calendar-event me-2"></i>Expense Date
+                        </label>
+                        <input type="date" class="form-control" id="expenseDate" name="expenseDateInput" required>
+                        <div class="form-text">When was this expense incurred?</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="photographer" class="form-label fw-semibold">
+                            <i class="bi bi-person-badge me-2"></i>Photographer ID
+                        </label>
+                        <input type="number" class="form-control" id="photographer" th:field="*{photographer.photographerID}"
+                               placeholder="Enter photographer ID" required>
+                        <div class="form-text">ID of the photographer who incurred this expense</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="status" class="form-label fw-semibold">
+                            <i class="bi bi-flag me-2"></i>Status
+                        </label>
+                        <select class="form-select" id="status" th:field="*{status}">
+                            <option value="Pending">Pending Approval</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                        <div class="form-text">Current approval status of this expense</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label fw-semibold">
+                    <i class="bi bi-chat-text me-2"></i>Description
+                </label>
+                <textarea class="form-control" id="description" th:field="*{description}" rows="4"
+                          placeholder="Provide details about this expense..." required></textarea>
+                <div class="form-text">Detailed description of what this expense was for</div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a th:href="@{/financial/expenses}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle me-2"></i>Record Expense
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Category card selection
+    document.addEventListener('DOMContentLoaded', function() {
+        const categoryCards = document.querySelectorAll('.category-card');
+        const expenseTypeSelect = document.getElementById('expenseTypeSelect');
+        const expenseDateInput = document.getElementById('expenseDate');
+        const amountInput = document.getElementById('amount');
+
+        // Set today's date as default
+        if (expenseDateInput && !expenseDateInput.value) {
+            const today = new Date();
+            expenseDateInput.value = today.toISOString().split('T')[0];
+        }
+
+        // Add client-side validation for amount
+        if (amountInput) {
+            amountInput.addEventListener('input', function() {
+                const value = parseFloat(this.value);
+                if (value <= 0) {
+                    this.setCustomValidity('Amount must be greater than zero');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+        }
+
+        categoryCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove active class from all cards
+                categoryCards.forEach(c => c.classList.remove('active'));
+
+                // Add active class to clicked card
+                this.classList.add('active');
+
+                // Update hidden select value
+                const value = this.getAttribute('data-value');
+                expenseTypeSelect.value = value;
+            });
+        });
+    });
+</script>
+</body>
+</html>

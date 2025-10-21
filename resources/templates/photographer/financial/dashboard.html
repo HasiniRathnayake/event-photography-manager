@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Dashboard - Event Photography</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .dashboard-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .metric-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        .metric-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .metric-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        .page-header {
+            color: white;
+            margin-bottom: 2rem;
+        }
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .revenue-positive {
+            color: #28a745;
+        }
+        .revenue-negative {
+            color: #dc3545;
+        }
+        .table-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-paid { background-color: #d4edda; color: #155724; }
+        .badge-pending { background-color: #fff3cd; color: #856404; }
+        .badge-overdue { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px);">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="#">
+            <i class="bi bi-camera me-2"></i>Event Photography Photographer
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/photographer/dashboard}">
+                        <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/photographer/events}">
+                        <i class="bi bi-calendar-event me-1"></i>Events
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/photographer/albums}">
+                        <i class="bi bi-collection me-1"></i>Albums
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/photographer/financial/dashboard}">
+                        <i class="bi bi-currency-dollar me-1"></i>Financial
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/photographer/profile}">
+                        <i class="bi bi-person me-1"></i>Profile
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1><i class="bi bi-currency-dollar me-3"></i>Financial Dashboard</h1>
+        <p class="text-white">View your financial performance and earnings</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="dashboard-container">
+        <!-- Key Metrics Row -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="metric-card text-center">
+                    <i class="bi bi-currency-dollar metric-icon revenue-positive"></i>
+                    <div class="metric-value revenue-positive" th:text="${#numbers.formatDecimal(totalRevenue ?: 0, 1, 'COMMA', 2, 'POINT')}">0.00</div>
+                    <div class="metric-label">Total Revenue (Rs.)</div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="metric-card text-center">
+                    <i class="bi bi-wallet2 metric-icon revenue-negative"></i>
+                    <div class="metric-value revenue-negative" th:text="${#numbers.formatDecimal(totalExpenses ?: 0, 1, 'COMMA', 2, 'POINT')}">0.00</div>
+                    <div class="metric-label">Total Expenses (Rs.)</div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="metric-card text-center">
+                    <i class="bi bi-graph-up metric-icon" th:classappend="${totalProfit != null and totalProfit.compareTo(T(java.math.BigDecimal).ZERO) >= 0} ? 'revenue-positive' : 'revenue-negative'"></i>
+                    <div class="metric-value" th:classappend="${totalProfit != null and totalProfit.compareTo(T(java.math.BigDecimal).ZERO) >= 0} ? 'revenue-positive' : 'revenue-negative'" th:text="${#numbers.formatDecimal(totalProfit ?: 0, 1, 'COMMA', 2, 'POINT')}">0.00</div>
+                    <div class="metric-label">Net Profit (Rs.)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="row mb-4">
+            <div class="col-md-12 text-end">
+                <a th:href="@{/photographer/financial/report}" class="btn btn-primary">
+                    <i class="bi bi-file-earmark-bar-graph me-2"></i>Generate Detailed Report
+                </a>
+                <a th:href="@{/photographer/expenses}" class="btn btn-outline-primary">
+                    <i class="bi bi-receipt me-2"></i>View Expenses
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Bookings -->
+        <div class="table-container">
+            <h5 class="mb-3"><i class="bi bi-calendar-check me-2"></i>Recent Bookings</h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Event</th>
+                            <th>Date</th>
+                            <th>Amount (Rs.)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="booking : ${bookings}" th:if="${bookings != null}">
+                            <td th:text="${booking.bookingID}">1</td>
+                            <td th:text="${booking.event?.eventName ?: 'N/A'}">Event Name</td>
+                            <td th:text="${#temporals.format(booking.bookingDate, 'MMM dd, yyyy')}">Date</td>
+                            <td th:text="${#numbers.formatDecimal(booking.totalAmount ?: 0, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                            <td>
+                                <span class="status-badge"
+                                      th:class="'status-badge ' + (${booking.status == 'Confirmed'} ? 'badge-paid' : 
+                                      (${booking.status == 'Pending'} ? 'badge-pending' : 'badge-overdue'))"
+                                      th:text="${booking.status}">
+                                    Status
+                                </span>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(bookings)}">
+                            <td colspan="5" class="text-center text-muted py-4">
+                                <i class="bi bi-calendar-x me-2" style="font-size: 2rem;"></i>
+                                <div>No bookings found</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Expenses -->
+        <div class="table-container mt-4">
+            <h5 class="mb-3"><i class="bi bi-receipt me-2"></i>Recent Expenses</h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Expense ID</th>
+                            <th>Description</th>
+                            <th>Date</th>
+                            <th>Amount (Rs.)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="expense : ${expenses}" th:if="${expenses != null}">
+                            <td th:text="${expense.expenseID}">1</td>
+                            <td th:text="${expense.description}">Description</td>
+                            <td th:text="${#temporals.format(expense.expenseDate, 'MMM dd, yyyy')}">Date</td>
+                            <td th:text="${#numbers.formatDecimal(expense.amount ?: 0, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                            <td>
+                                <span class="status-badge"
+                                      th:class="'status-badge ' + (${expense.status == 'Approved'} ? 'badge-paid' : 'badge-pending')"
+                                      th:text="${expense.status ?: 'Pending'}">
+                                    Status
+                                </span>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(expenses)}">
+                            <td colspan="5" class="text-center text-muted py-4">
+                                <i class="bi bi-receipt me-2" style="font-size: 2rem;"></i>
+                                <div>No expenses found</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
